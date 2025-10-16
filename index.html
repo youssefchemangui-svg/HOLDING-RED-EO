@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HOLDING RED EO</title>
+<style>
+  :root{
+    --bg:#f7f3ea;
+    --paper:#fffdf8;
+    --accent:#b4532b; /* fournil warm brown */
+    --muted:#6b7280;
+    --shadow: 0 6px 18px rgba(11,11,11,0.08);
+    --radius:12px;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  html,body{height:100%;background:linear-gradient(180deg,var(--bg),#efe9dc);margin:0;padding:18px;}
+  .container{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+  header{display:flex;align-items:center;gap:14px}
+  .logo{
+    width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,#fff 0%, #f6efe4 100%);
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;border:3px solid rgba(180,83,43,0.06)
+  }
+  .logo h1{font-size:20px;margin:0;color:var(--accent);letter-spacing:0.6px}
+  header .title{line-height:1}
+  header h2{margin:0;font-size:1.05rem}
+  header p{margin:0;color:var(--muted);font-size:0.9rem}
+
+  main.kbis{background:var(--paper);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.03)}
+  .kbis .meta{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .kbis .meta .left{min-width:200px}
+  .kbis h3{margin:6px 0 0;font-size:0.98rem}
+  .kbis p.lead{margin:6px 0;color:var(--muted);font-size:0.9rem}
+
+  .section{margin-top:14px;padding-top:12px;border-top:1px dashed rgba(0,0,0,0.06)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .field{background:linear-gradient(180deg,#fff,#fcfbf7);padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.03)}
+  .field .label{font-size:0.78rem;color:var(--muted);margin-bottom:6px}
+  .field .value{font-weight:600;font-size:0.98rem;color:#111}
+
+  /* big single column on mobile */
+  @media (max-width:720px){
+    .grid{grid-template-columns:1fr}
+    header{gap:10px}
+    .logo{width:58px;height:58px}
+  }
+
+  /* decorative stamp */
+  .stamp{
+    position:relative;
+    width:120px;height:120px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    border:8px solid rgba(180,83,43,0.12);
+    color:var(--accent);font-weight:700;font-size:12px;
+    transform:rotate(-8deg);
+    opacity:0.95;
+    mix-blend-mode:multiply;
+  }
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  button{
+    background:var(--accent);color:white;border:0;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;
+    box-shadow: 0 6px 14px rgba(180,83,43,0.16);
+  }
+  button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(180,83,43,0.16)}
+  .small{padding:8px 10px;font-size:0.92rem}
+
+  footer{font-size:0.85rem;color:var(--muted);text-align:center;margin-bottom:18px}
+
+  /* nice print style */
+  @media print{
+    body{background:white}
+    header, .controls, footer{display:none}
+    .container{padding:0}
+    main.kbis{box-shadow:none;border-radius:0}
+  }
+  
+  /* Modal pour afficher le PDF */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: var(--radius);
+    width: 95%;
+    max-width: 900px;
+    max-height: 90%;
+    overflow-y: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--muted);
+    z-index: 10;
+  }
+  
+  .pdf-container {
+    width: 100%;
+    height: 600px;
+    border: 1px solid #ddd;
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9f9f9;
+  }
+  
+  .pdf-preview {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  
+  .pdf-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+  }
+  
+  .pdf-info {
+    background-color: #f5f5f5;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo" aria-hidden>
+        <h1>LE</h1>
+      </div>
+      <div class="title">
+        <h2>Extrait Kbis — HOLDING RED EO</h2>
+        <p>Greffe du Tribunal de Commerce de Brest — mise à jour : 19 juin 2025</p>
+      </div>
+      <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <div class="stamp" title="Tampon tribunal">TRIBUNAL<br/>Brest</div>
+        <small style="color:var(--muted)">N° de gestion: 2007B00386</small>
+      </div>
+    </header>
+
+    <main class="kbis" id="kbis-card" role="main">
+      <div class="meta">
+        <div class="left">
+          <h3>IDENTIFICATION DE LA PERSONNE MORALE</h3>
+          <p class="lead">Données extraites de l'enregistrement principal au Registre du Commerce et des Sociétés.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div style="text-align:right">
+            <div style="font-size:0.82rem;color:var(--muted)">Immatriculation au RCS</div>
+            <div style="font-weight:700">499 062 370 R.C.S. Brest</div>
+            <div style="font-size:0.82rem;color:var(--muted);margin-top:6px">Date d'immatriculation</div>
+            <div style="font-weight:600">17/07/2007</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section grid" style="margin-top:16px">
+        <div class="field">
+          <div class="label">Dénomination / raison sociale</div>
+          <div class="value">HOLDING RED EO</div>
+        </div>
+        <div class="field">
+          <div class="label">Forme juridique</div>
+          <div class="value">Société à responsabilité limitée (Société à associé unique)</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Capital social</div>
+          <div class="value">270 000,00 €</div>
+        </div>
+        <div class="field">
+          <div class="label">Adresse du siège</div>
+          <div class="value">28 Avenue de Tarente, 29200 Brest</div>
+        </div>
+
+        <div class="field" style="grid-column:1 / -1">
+          <div class="label">Activités principales</div>
+          <div class="value" style="font-weight:500">
+            Prise de participation (achat, souscription, apport, fusion) ; prestations de services administratifs, financiers, commerciaux, techniques et informatiques ; gestion centralisée de la trésorerie de groupe ; formation professionnelle.
+          </div>
+        </div>
+      </div>
+
+      <div class="section grid">
+        <div class="field">
+          <div class="label">Gérant</div>
+          <div class="value">Perez Ronan</div>
+        </div>
+        <div class="field">
+          <div class="label">Domicile personnel (mention)</div>
+          <div class="value">8 Rue Surcouf, 29290 Saint-Renan</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Renseignements - établissement principal</div>
+          <div class="value">28 Avenue de Tarente, 29200 Brest</div>
+        </div>
+        <div class="field">
+          <div class="label">Date de commencement d'activité</div>
+          <div class="value">11/07/2007</div>
+        </div>
+      </div>
+
+      <div class="section grid">
+        <div class="field">
+          <div class="label">Origine du fonds / activité</div>
+          <div class="value">Création (transmission universelle du patrimoine à l'associé unique : 26/06/2013)</div>
+        </div>
+        <div class="field">
+          <div class="label">Précédent exploitant - Dénomination</div>
+          <div class="value">RED EO (N° unique d'identification : 377 751 243)</div>
+        </div>
+      </div>
+
+      <div class="section" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="color:var(--muted);font-size:0.9rem">
+          <strong>Mise à jour :</strong> 19 juin 2025<br/>
+          <strong>Greffe :</strong> Tribunal de Commerce de Brest
+        </div>
+        <div class="controls" aria-hidden>
+          <button id="printBtn" class="small">🖨 Imprimer / PDF</button>
+          <button id="copyBtn" class="ghost small">📋 Copier les infos</button>
+          <button id="pdfBtn" class="small">📄 Afficher PDF</button>
+        </div>
+      </div>
+
+    </main>
+
+    <footer>
+      Page générée — données affichées à titre informatif. Sauvegarde locale recommandée.
+    </footer>
+  </div>
+
+  <!-- Modal pour afficher le PDF -->
+  <div id="pdfModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h3>Document PDF - HOLDING RED EO</h3>
+      
+      <div class="pdf-info">
+        <strong>Fichier :</strong> kabis.pdf • <strong>Taille :</strong> ~450 KB • <strong>Pages :</strong> 2
+      </div>
+      
+      <div class="pdf-container">
+        <iframe src="kabis.pdf" class="pdf-preview" title="Aperçu du document Kbis">
+          Votre navigateur ne supporte pas l'affichage des PDF. 
+          <a href="kabis.pdf" download="kabis-holding-red-eo.pdf">Téléchargez le PDF</a> pour le visualiser.
+        </iframe>
+      </div>
+      
+      <div class="pdf-actions">
+        <button id="downloadPdfBtn" class="small">📥 Télécharger PDF</button>
+        <button id="closePdfBtn" class="ghost small">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Données sources (extrait Kbis)
+  const kbis = {
+    raison_sociale: "HOLDING RED EO",
+    forme_juridique: "Société à responsabilité limitée (Société à associé unique)",
+    rcs: "499 062 370 R.C.S. Brest",
+    date_immatriculation: "17/07/2007",
+    capital: "270 000,00 €",
+    siege: "28 Avenue de Tarente, 29200 Brest",
+    activites: "Prise de participation (achat, souscription, apport, fusion) ; prestations de services administratifs, financiers, commerciaux, techniques et informatiques ; gestion centralisée de la trésorerie de groupe ; formation professionnelle.",
+    gerant: { nom: "PERRE Roman", adresse: "8 Rue Surcouf, 29290 Saint-Renan" },
+    etablissement: { adresse: "28 Avenue de Tarente, 29200 Brest", date_debut: "11/07/2007" },
+    transmission: { date: "26/06/2013", ancien_nom: "RED EO", ancien_id: "377 751 243" },
+    maj: "19 juin 2025",
+    greffe: "Tribunal de Commerce de Brest"
+  };
+
+  // Copier les infos en texte lisible
+  document.getElementById('copyBtn').addEventListener('click', async () => {
+    const text = `
+HOLDING RED EO
+RCS: ${kbis.rcs} — Immatriculation: ${kbis.date_immatriculation}
+Capital: ${kbis.capital}
+Siège: ${kbis.siege}
+
+Activités principales:
+${kbis.activites}
+
+Gérant: ${kbis.gerant.nom} — ${kbis.gerant.adresse}
+Etablissement principal: ${kbis.etablissement.adresse} (début d'activité: ${kbis.etablissement.date_debut})
+
+Transmission: ${kbis.transmission.date} — Précédent exploitant: ${kbis.transmission.ancien_nom} (${kbis.transmission.ancien_id})
+
+Mise à jour: ${kbis.maj} — Greffe: ${kbis.greffe}
+    `.trim();
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Infos copiées dans le presse-papier !");
+    } catch (e) {
+      // fallback
+      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); alert("Infos copiées (mode secours)."); } catch(e2){ alert("Impossible de copier automatiquement."); }
+      ta.remove();
+    }
+  });
+
+  // Imprimer
+  document.getElementById('printBtn').addEventListener('click', () => {
+    window.print();
+  });
+
+  // Gestion du modal PDF
+  const pdfModal = document.getElementById('pdfModal');
+  const pdfBtn = document.getElementById('pdfBtn');
+  const closeBtn = document.querySelector('.close-btn');
+  const closePdfBtn = document.getElementById('closePdfBtn');
+  const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+
+  // Ouvrir le modal PDF
+  pdfBtn.addEventListener('click', () => {
+    pdfModal.style.display = 'flex';
+  });
+
+  // Fermer le modal PDF
+  closeBtn.addEventListener('click', () => {
+    pdfModal.style.display = 'none';
+  });
+
+  closePdfBtn.addEventListener('click', () => {
+    pdfModal.style.display = 'none';
+  });
+
+  // Fermer le modal en cliquant en dehors
+  window.addEventListener('click', (e) => {
+    if (e.target === pdfModal) {
+      pdfModal.style.display = 'none';
+    }
+  });
+
+  // Télécharger le PDF
+  downloadPdfBtn.addEventListener('click', () => {
+    // Créer un lien de téléchargement pour le fichier kabis.pdf
+    const a = document.createElement('a');
+    a.href = 'kabis.pdf';
+    a.download = 'kabis-holding-red-eo.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+
+  // (optionnel) tu peux étendre ce script pour remplacer dynamiquement les champs si tu veux afficher d'autres Kbis.
+</script>
+</body>
+</html>
